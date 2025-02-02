@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISTEMAKHIR - Observasi & Wawancara</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+  <!-- Quill.js CSS -->
+  <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    /* Card Styling */
+    .blog-card {
+      position: relative;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      background-color: #ffffff;
+      border: 1px solid rgba(0, 0, 0, 0.1); /* Thin border */
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    .blog-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Semi-transparent Icon Background */
+    .icon-bg {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, rgba(0, 123, 255, 0.1), rgba(0, 123, 255, 0.05));
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+      opacity: 0.8; /* Semi-transparent */
+    }
+    .icon-bg i {
+      font-size: 1.5rem;
+      color: #0d6efd; /* Blue */
+    }
+
+    /* Content Styling */
+    .card-body {
+      position: relative;
+      z-index: 2;
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.5rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      color: #333;
+    }
+    .card-text {
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 0.75rem;
+      color: #555;
+    }
+    .text-muted {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    /* Button Styling for Lihat Dokumen */
+    .btn-lihat-dokumen {
+      background-color: #0d6efd; /* Blue */
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 0.5rem 1rem;
+    }
+    .btn-lihat-dokumen:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Delete Button Styling */
+    .btn-danger {
+      background-color: #dc3545;
+      border: none;
+      border-radius: 8px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 0.5rem 0.75rem;
+    }
+    .btn-danger:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Quill Editor Styling */
+    #editor {
+      min-height: 200px;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">SISTEMAKHIR</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="arsip.html">Arsip</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="observasi_wawancara.html">Observasi & Wawancara</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Button to Open Modal -->
+  <div class="container mt-4">
+    <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addBlogModal">
+      <i class="fa-solid fa-plus me-2"></i>Tambah Observasi/Wawancara
+    </button>
+
+    <!-- Blog List -->
+    <div class="row g-4" id="blogList">
+      <!-- Dynamic Content from Supabase -->
+    </div>
+  </div>
+
+  <!-- Modal for Adding Blog -->
+  <div class="modal fade" id="addBlogModal" tabindex="-1" aria-labelledby="addBlogModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addBlogModalLabel">Tambah Observasi/Wawancara Baru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="blogForm">
+            <div class="mb-3">
+              <label for="judul" class="form-label">Judul</label>
+              <input type="text" class="form-control" id="judul" name="judul" required>
+            </div>
+            <div class="mb-3">
+              <label for="deskripsi" class="form-label">Deskripsi</label>
+              <div id="editor"></div>
+              <textarea id="deskripsi" name="deskripsi" style="display: none;"></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="tanggalUpload" class="form-label">Tanggal Upload</label>
+              <input type="date" class="form-control" id="tanggalUpload" name="tanggal_upload" required>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" id="saveBlog">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- Quill.js JS -->
+  <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+  <!-- Custom JS -->
+  <script>
+    // Initialize Supabase Client
+    const supabaseUrl = 'https://eyzvqdknrkkjznqvmxgb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Initialize Quill Editor
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          ['bold', 'italic', 'underline', 'strike'],        // Toggles bold, italic, underline, strike-through
+          ['blockquote', 'code-block'],                     // Blockquote and code block
+          [{ 'header': 1 }, { 'header': 2 }],              // Headers
+          [{ 'list': 'ordered' }, { 'list': 'bullet' }],    // Ordered and unordered lists
+          [{ 'indent': '-1' }, { 'indent': '+1' }],         // Indentation
+          [{ 'size': ['small', false, 'large', 'huge'] }],  // Text size
+          [{ 'color': [] }, { 'background': [] }],          // Text color and background color
+          ['link', 'image'],                                // Links and images
+        ]
+      }
+    });
+
+    // Fetch and Display Blogs
+    async function fetchBlogs() {
+      const { data, error } = await supabaseClient.from('observasi_wawancara').select('*');
+      if (error) console.error('Error fetching data:', error);
+      else {
+        const blogList = document.getElementById('blogList');
+        blogList.innerHTML = '';
+
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'col-md-4';
+          card.innerHTML = `
+            <div class="blog-card shadow-sm h-100">
+              <div class="icon-bg">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title">${item.judul}</h5>
+                <p class="card-text">${item.deskripsi.substring(0, 100)}...</p>
+                <small class="text-muted">Tanggal Upload: ${item.tanggal_upload}</small>
+              </div>
+              <div class="card-footer d-flex justify-content-between align-items-center">
+                <a href="detail_blog.html?id=${item.id}" class="btn btn-lihat-dokumen btn-sm">
+                  <i class="fa-solid fa-eye me-1"></i>Lihat Detail
+                </a>
+                <button class="btn btn-danger btn-sm" onclick="deleteBlog(${item.id})">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          blogList.appendChild(card);
+        });
+      }
+    }
+
+    // Save Blog to Supabase
+    document.getElementById('saveBlog').addEventListener('click', async () => {
+      const form = document.getElementById('blogForm');
+      const judul = document.getElementById('judul').value;
+      const deskripsi = document.getElementById('deskripsi');
+      const tanggalUpload = document.getElementById('tanggalUpload').value;
+
+      // Get content from Quill editor
+      deskripsi.value = quill.root.innerHTML;
+
+      const blogData = {
+        judul: judul,
+        deskripsi: deskripsi.value,
+        tanggal_upload: tanggalUpload
+      };
+
+      const { error } = await supabaseClient.from('observasi_wawancara').insert([blogData]);
+      if (error) {
+        console.error('Error saving data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Gagal menyimpan data!',
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: 'Data berhasil disimpan!',
+        });
+        form.reset();
+        quill.setText(''); // Clear Quill editor
+        fetchBlogs();
+        bootstrap.Modal.getInstance(document.getElementById('addBlogModal')).hide();
+      }
+    });
+
+    // Delete Blog from Supabase
+    async function deleteBlog(id) {
+      const { error } = await supabaseClient.from('observasi_wawancara').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Gagal menghapus data!',
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: 'Data berhasil dihapus!',
+        });
+        fetchBlogs();
+      }
+    }
+
+    // Initial Data Fetch
+    fetchBlogs();
+  </script>
+</body>
+</html>

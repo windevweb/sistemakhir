@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SISTEMAKHIR - Arsip</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+  <!-- SweetAlert2 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    /* Badge Styling */
+    .badge-diajukan {
+      background-color: #ffc107; /* Yellow */
+      color: black;
+    }
+    .badge-disetujui {
+      background-color: #198754; /* Green */
+      color: white;
+    }
+
+    /* Button Styling for Lihat Dokumen */
+    .btn-lihat-dokumen {
+      background-color: #0d6efd; /* Blue */
+      color: white;
+      border: none;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .btn-lihat-dokumen:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+      <a class="navbar-brand fw-bold" href="#">SISTEMAKHIR</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="index.html">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="arsip.html">Arsip</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="observasi_wawancara.html">observasi wawancara</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Button to Open Modal -->
+  <div class="container mt-4">
+    <button class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#addArchiveModal">
+      <i class="fa-solid fa-plus me-2"></i>Tambah Arsip
+    </button>
+
+    <!-- Accordion for Archive Categories -->
+    <div class="accordion" id="arsipAccordion">
+      <!-- Proposal Section -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingProposal">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#proposal">
+            Proposal
+          </button>
+        </h2>
+        <div id="proposal" class="accordion-collapse collapse show" data-bs-parent="#arsipAccordion">
+          <div class="accordion-body">
+            <ul class="list-group" id="proposalList">
+              <!-- Dynamic Content from Supabase -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seminar Section -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingSeminar">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#seminar">
+            Seminar
+          </button>
+        </h2>
+        <div id="seminar" class="accordion-collapse collapse" data-bs-parent="#arsipAccordion">
+          <div class="accordion-body">
+            <ul class="list-group" id="seminarList">
+              <!-- Dynamic Content from Supabase -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Karya Akhir Section -->
+      <div class="accordion-item">
+        <h2 class="accordion-header" id="headingKaryaAkhir">
+          <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#karyaakhir">
+            Karya Akhir
+          </button>
+        </h2>
+        <div id="karyaakhir" class="accordion-collapse collapse" data-bs-parent="#arsipAccordion">
+          <div class="accordion-body">
+            <ul class="list-group" id="karyaAkhirList">
+              <!-- Dynamic Content from Supabase -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Modal for Adding Archive -->
+  <div class="modal fade" id="addArchiveModal" tabindex="-1" aria-labelledby="addArchiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addArchiveModalLabel">Tambah Arsip Baru</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="archiveForm">
+            <div class="mb-3">
+              <label for="judul" class="form-label">Judul</label>
+              <input type="text" class="form-control" id="judul" name="judul" required>
+            </div>
+            <div class="mb-3">
+              <label for="deskripsi" class="form-label">Deskripsi</label>
+              <textarea class="form-control" id="deskripsi" name="deskripsi" rows="3" required></textarea>
+            </div>
+            <div class="mb-3">
+              <label for="linkUrl" class="form-label">Link URL</label>
+              <input type="url" class="form-control" id="linkUrl" name="link_url" required>
+            </div>
+            <div class="mb-3">
+              <label for="tanggalUpload" class="form-label">Tanggal Upload</label>
+              <input type="date" class="form-control" id="tanggalUpload" name="tanggal_upload" required>
+            </div>
+            <div class="mb-3">
+              <label for="typeRevisi" class="form-label">Type Revisi</label>
+              <select class="form-select" id="typeRevisi" name="type_revisi" required>
+                <option value="diajukan">Diajukan</option>
+                <option value="disetujui">Disetujui</option>
+              </select>
+            </div>
+            <div class="mb-3">
+              <label for="jenis" class="form-label">Jenis</label>
+              <select class="form-select" id="jenis" name="jenis" required>
+                <option value="proposal">Proposal</option>
+                <option value="seminar">Seminar</option>
+                <option value="karya_akhir">Karya Akhir</option>
+              </select>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+          <button type="button" class="btn btn-primary" id="saveArchive">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- SweetAlert2 JS -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <!-- Bootstrap JS and Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <!-- Custom JS -->
+  <script>
+    // Initialize Supabase Client
+    const supabaseUrl = 'https://eyzvqdknrkkjznqvmxgb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV5enZxZGtucmtranpucXZteGdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg0OTc1NzksImV4cCI6MjA1NDA3MzU3OX0.v-3bKrF431br9SKSXPzUOHU-f4CW_4SAgtSic502sbs';
+    const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Fetch and Display Data
+    async function fetchArchives() {
+      const { data, error } = await supabaseClient.from('arsip').select('*');
+      if (error) console.error('Error fetching data:', error);
+      else {
+        const proposalList = document.getElementById('proposalList');
+        const seminarList = document.getElementById('seminarList');
+        const karyaAkhirList = document.getElementById('karyaAkhirList');
+
+        proposalList.innerHTML = '';
+        seminarList.innerHTML = '';
+        karyaAkhirList.innerHTML = '';
+
+        data.forEach(item => {
+          const listItem = document.createElement('li');
+          listItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+
+          // Badge for Type Revisi
+          const badgeClass = item.type_revisi === 'disetujui' ? 'badge-disetujui' : 'badge-diajukan';
+          const badge = `<span class="badge ${badgeClass}">${item.type_revisi}</span>`;
+
+          // Button for Lihat Dokumen
+          const lihatDokumenButton = `
+            <a href="${item.link_url}" target="_blank" class="btn btn-lihat-dokumen btn-sm me-2">
+              <i class="fa-solid fa-eye me-1"></i>Lihat Dokumen
+            </a>
+          `;
+
+          // Delete Button
+          const deleteButton = `
+            <button class="btn btn-danger btn-sm" onclick="deleteArchive(${item.id})">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          `;
+
+          listItem.innerHTML = `
+            <div>
+              <strong>${item.judul}</strong><br>
+              ${item.deskripsi}<br>
+              <small>Tanggal Upload: ${item.tanggal_upload}</small>
+            </div>
+            <div>
+              ${lihatDokumenButton}
+              ${badge}
+              ${deleteButton}
+            </div>
+          `;
+
+          if (item.jenis === 'proposal') proposalList.appendChild(listItem);
+          else if (item.jenis === 'seminar') seminarList.appendChild(listItem);
+          else if (item.jenis === 'karya_akhir') karyaAkhirList.appendChild(listItem);
+        });
+      }
+    }
+
+    // Save Archive to Supabase
+    document.getElementById('saveArchive').addEventListener('click', async () => {
+      const form = document.getElementById('archiveForm');
+      const formData = new FormData(form);
+
+      const archiveData = {
+        judul: formData.get('judul'),
+        deskripsi: formData.get('deskripsi'),
+        link_url: formData.get('link_url'),
+        tanggal_upload: formData.get('tanggal_upload'),
+        type_revisi: formData.get('type_revisi'),
+        jenis: formData.get('jenis')
+      };
+
+      const { error } = await supabaseClient.from('arsip').insert([archiveData]);
+      if (error) {
+        console.error('Error saving data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Gagal menyimpan data!',
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: 'Data berhasil disimpan!',
+        });
+        form.reset();
+        fetchArchives();
+        bootstrap.Modal.getInstance(document.getElementById('addArchiveModal')).hide();
+      }
+    });
+
+    // Delete Archive from Supabase
+    async function deleteArchive(id) {
+      const { error } = await supabaseClient.from('arsip').delete().eq('id', id);
+      if (error) {
+        console.error('Error deleting data:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Gagal menghapus data!',
+        });
+      } else {
+        Swal.fire({
+          icon: 'success',
+          title: 'Berhasil!',
+          text: 'Data berhasil dihapus!',
+        });
+        fetchArchives();
+      }
+    }
+
+    // Initial Data Fetch
+    fetchArchives();
+  </script>
+
+</body>
+</html>
